@@ -214,9 +214,62 @@ load_file_vk()
 {
     local url=$1
     local ofname=$2
+    local vformat
 
     msg "Loading file from VKontakte to $ofname"
-    Yt "$url" "$ofname"
+    vformat=`load_file_vk_get_vformat "$url"`
+    if [ -z "$vformat" ]; then
+        error "Video format is not found"
+        return 1
+    fi
+    msg "Found format $vformat"
+    Ytf "$url" "$ofname" "$vformat"
+}
+
+# Determine the optimal format for video on Vk.com;
+# It returns hls-form for different formats; for the 720p format
+# otherwise for the 1080p format otherwise for the 480p format if
+# previous formats don't exist
+# load_file_vk_get_vformat(url)
+# args:
+#   url - The url for video on Vk.com
+# return:
+#   "hls-NNNN" for 720p |
+#   "hls-NNNN" for 1080p |
+#   "hls-NNNN" for 480p |
+#   none
+load_file_vk_get_vformat()
+{
+    local url=$1
+
+    Ytl "$url" | awk '
+$1 ~ /^hls/ && $2 == "mp4" {
+    if ($3 ~ /x480$/) {
+        has480 = 1
+        vformat480 = $1
+    }
+    else if ($3 ~ /x720$/) {
+        has720 = 1
+        vformat720 = $1
+    }
+    else if ($3 ~ /x1080$/) {
+        has1080 = 1
+        vformat1080 = $1
+    }
+}
+END {
+    if (has720) {
+       vformat = vformat720
+    }
+    else if (has1080) {
+       vformat = vformat1080
+    }
+    else if (has480) {
+       vformat = vformat480
+    }
+    print vformat
+}
+'
 }
 
 # Load file from Mail.ru
