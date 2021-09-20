@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Loads a film from YouTube.com, Ok.ru, VK.com and Mail.ru by url to
+# Loads a film from YouTube.com, Ok.ru, Vk.com and Mail.ru by url to
 # output filename, selecting right format of the video.
 # Copyright (C) 2021, Slava <freeprogs.feedback@yandex.ru>
 
@@ -68,11 +68,11 @@ Ytl()
     youtube-dl -F "$1" | sed '1,/format code/d'
 }
 
-# Load file from the YouTube, Ok.ru, vk.com or Mail.ru url to the
+# Load file from the YouTube, Ok.ru, Vk.com or Mail.ru url to the
 # output file
 # load_file(url, ofname)
 # args:
-#   url - The url for video on YouTube, Ok.ru, vk.com or Mail.ru
+#   url - The url for video on YouTube, Ok.ru, Vk.com or Mail.ru
 #   ofname - The output file name
 # return:
 #   none
@@ -96,11 +96,11 @@ load_file()
 # Detect url type that means on which site this url is placed
 # detect_url_type(url)
 # args:
-#   url - The url to video on YouTube, Ok.ru or vk.com
+#   url - The url to video on YouTube, Ok.ru or Vk.com
 # return:
 #   "0" - For YouTube url
 #   "1" - For Ok.ru url
-#   "2" - For vk.com url
+#   "2" - For Vk.com url
 #   "3" - For Mail.ru url
 #   none - if unknown url type
 detect_url_type()
@@ -202,10 +202,10 @@ END {print vformat}
 '
 }
 
-# Load file from vk.com
+# Load file from Vk.com
 # load_file_vk(url, ofname)
 # args:
-#   url - The url for video on vk.com
+#   url - The url for video on Vk.com
 #   ofname - The output filename for saving loaded video
 # return:
 #   0 if file loaded
@@ -274,11 +274,11 @@ END {
 '
 }
 
-# Load video from YouTube, Ok.ru, vk.com or Mail.ru with determination
+# Load video from YouTube, Ok.ru, Vk.com or Mail.ru with determination
 # of optimal video format
 # main([url, ofname])
 # args:
-#   url - The url for video on YouTube, Ok.ru, vk.com or Mail.ru
+#   url - The url for video on YouTube, Ok.ru, Vk.com or Mail.ru
 #   ofname - The output filename for the loaded video
 # return:
 #   0 - if video loaded and saved
