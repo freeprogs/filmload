@@ -189,11 +189,11 @@ load_file_ok_get_vformat()
 
     Ytl "$url" | awk '
 state == 0 {
-    if ($1 ~ "^(sd|hd)$")
+    if ($1 ~ /^(sd|hd)$/)
         state = 1
 }
 state == 1 {
-    if ($1 ~ "^hls-[0-9]+$") {
+    if ($1 ~ /^hls-[0-9]+$/) {
         vformat = $1
         state = 0
     }
@@ -256,9 +256,9 @@ load_file_mr_get_vformat()
     local url=$1
 
     Ytl "$url" | awk '
-$1 ~ "480p" { has480 = 1 }
-$1 ~ "720p" { has720 = 1 }
-$1 ~ "1080p" { has1080 = 1 }
+$1 ~ /480p/ { has480 = 1 }
+$1 ~ /720p/ { has720 = 1 }
+$1 ~ /1080p/ { has1080 = 1 }
 END {
     if (has720) {
        vformat = "720p"
