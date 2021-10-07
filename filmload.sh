@@ -309,18 +309,27 @@ load_file_mr_get_vformat()
     local url=$1
 
     Ytl "$url" | awk '
-$1 ~ /480p/ { has480 = 1 }
-$1 ~ /720p/ { has720 = 1 }
-$1 ~ /1080p/ { has1080 = 1 }
+$1 ~ /480p/ {
+    has480 = 1
+    vformat480 = "480p"
+}
+$1 ~ /720p/ {
+    has720 = 1
+    vformat720 = "720p"
+}
+$1 ~ /1080p/ {
+    has1080 = 1
+    vformat1080 = "1080p"
+}
 END {
     if (has720) {
-       vformat = "720p"
+       vformat = vformat720
     }
     else if (has1080) {
-       vformat = "1080p"
+       vformat = vformat1080
     }
     else if (has480) {
-       vformat = "480p"
+       vformat = vformat480
     }
     print vformat
 }
