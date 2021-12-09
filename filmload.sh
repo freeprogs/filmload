@@ -38,8 +38,8 @@ Ytf()
         return 1
     } 1>&2
     case $# in
-    1) youtube-dl -c -f "$fmtn" "$1";;
-    *) youtube-dl -c -f "$fmtn" "$1" -o "$2";;
+      1) youtube-dl -c -f "$fmtn" "$1";;
+      *) youtube-dl -c -f "$fmtn" "$1" -o "$2";;
     esac
 }
 
@@ -52,8 +52,8 @@ Yt()
         return 1
     } 1>&2
     case $# in
-    1) youtube-dl -c "$1";;
-    *) youtube-dl -c "$1" -o "$2";;
+      1) youtube-dl -c "$1";;
+      *) youtube-dl -c "$1" -o "$2";;
     esac
 }
 
