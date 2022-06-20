@@ -43,6 +43,23 @@ Ytf()
     esac
 }
 
+# Download YouTube video in selected format
+# Use yt-dlp program
+# Ytfn(url[, ofile[, fmt=18]])
+Ytfn()
+{
+    local fmtn=${3:-18}
+
+    [ $# -eq 0 -o "$1" = "--help" ] && {
+        echo "usage: $FUNCNAME url [ ofile ] [ fmtn=$fmtn ]"
+        return 1
+    } 1>&2
+    case $# in
+      1) yt-dlp -c -f "$fmtn" "$1";;
+      *) yt-dlp -c -f "$fmtn" "$1" -o "$2";;
+    esac
+}
+
 # Download YouTube video
 # Yt(url[, ofile])
 Yt()
