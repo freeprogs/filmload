@@ -185,7 +185,7 @@ load_file_yt()
         return 1
     fi
     msg "Found format $vformat"
-    Ytf "$url" "$ofname" "$vformat"
+    Ytfn "$url" "$ofname" "$vformat"
 }
 
 # Determine the optimal format for video on YouTube;
