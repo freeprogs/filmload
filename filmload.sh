@@ -74,6 +74,21 @@ Yt()
     esac
 }
 
+# Download YouTube video
+# Use yt-dlp program
+# Ytn(url[, ofile])
+Ytn()
+{
+    [ $# -eq 0 -o "$1" = "--help" ] && {
+        echo "usage: $FUNCNAME url [ ofile ]"
+        return 1
+    } 1>&2
+    case $# in
+      1) yt-dlp -c "$1";;
+      *) yt-dlp -c "$1" -o "$2";;
+    esac
+}
+
 # Get available YouTube video file formats
 # Ytl(url)
 Ytl()
