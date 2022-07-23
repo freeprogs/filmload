@@ -2,7 +2,7 @@
 
 # Loads a film from YouTube.com, Ok.ru, Vk.com and Mail.ru by url to
 # output filename, selecting right format of the video.
-# Copyright (C) 2021, Slava <freeprogs.feedback@yandex.ru>
+# Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>
 
 progname=`basename $0`
 
