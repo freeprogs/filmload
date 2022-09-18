@@ -461,7 +461,7 @@ load_file_br()
 # stdout:
 #   the m3u8 url for video url
 # return:
-#   0 if file loaded
+#   0 if source file loaded and parsed
 #   1 if any error
 load_file_br_get_m3u8_url()
 {
