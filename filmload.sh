@@ -441,6 +441,7 @@ load_file_br()
     local url=$1
     local ofname=$2
     local m3u8_url
+    local duration
 
     msg "Loading file from Brighteon.com to $ofname"
     m3u8_url=`load_file_br_get_m3u8_url "$url"`
@@ -449,6 +450,12 @@ load_file_br()
         return 1
     fi
     msg "Found m3u8 url"
+    duration=`load_file_br_get_duration "$url"`
+    if [ -z "$duration" ]; then
+        error "Duration is not found"
+        return 1
+    fi
+    msg "Duration of video is $duration"
     msg "No resume. Start from beginning."
     Yt "$m3u8_url" "$ofname" 2>&1 | \
         load_file_br_wrapper_wrap_to_hdr_times
@@ -469,6 +476,25 @@ load_file_br_get_m3u8_url()
     curl -s "$url" | sed '
 s%^.*"source":\[{"src":"%%
 s%","type":.*$%%
+q
+'
+}
+
+# Load duration for video from Brighteon.com
+# load_file_br_get_duration(url)
+# args:
+#   url - The url for video on Brighteon.com
+# stdout:
+#   duration of video
+# return:
+#   0 if source file loaded and parsed
+#   1 if any error
+load_file_br_get_duration()
+{
+    local url=$1
+    curl -s "$url" | sed '
+s%^.*"duration":"%%
+s%","is.*$%%
 q
 '
 }
