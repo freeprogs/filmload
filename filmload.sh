@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Loads a film from YouTube.com, Ok.ru, Vk.com and Mail.ru by url to
-# output filename, selecting right format of the video.
+# Loads a film from YouTube.com, Ok.ru, Vk.com, Mail.ru and Brighteon.com
+# by url to output filename, selecting right format of the video.
 # Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>
 
 progname=`basename $0`
@@ -100,11 +100,12 @@ Ytl()
     youtube-dl -F "$1" | sed '1,/format code/d'
 }
 
-# Load file from the YouTube, Ok.ru, Vk.com or Mail.ru url to the
-# output file
+# Load file from the YouTube, Ok.ru, Vk.com, Mail.ru or Brighteon.com url
+# to the output file
 # load_file(url, ofname)
 # args:
-#   url - The url for video on YouTube, Ok.ru, Vk.com or Mail.ru
+#   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru
+#         or Brighteon.com
 #   ofname - The output file name
 # return:
 #   none
@@ -113,7 +114,7 @@ load_file()
     local url=$1
     local ofname=$2
     local urltype
-    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3
+    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_BR=4
 
     urltype=`detect_url_type "$url"`
     case $urltype in
@@ -121,6 +122,7 @@ load_file()
       $UT_OK) load_file_ok "$url" "$ofname";;
       $UT_VK) load_file_vk "$url" "$ofname";;
       $UT_MR) load_file_mr "$url" "$ofname";;
+      $UT_BR) load_file_br "$url" "$ofname";;
       *) error "Unknown url type: \"$urltype\"";;
     esac
 }
@@ -128,17 +130,19 @@ load_file()
 # Detect url type that means on which site this url is placed
 # detect_url_type(url)
 # args:
-#   url - The url to video on YouTube, Ok.ru or Vk.com
+#   url - The url to video on YouTube, Ok.ru, Vk.com, Mail.ru
+#         or Brighteon.com
 # return:
 #   "0" - For YouTube url
 #   "1" - For Ok.ru url
 #   "2" - For Vk.com url
 #   "3" - For Mail.ru url
+#   "4" - For Brighteon.com url
 #   none - if unknown url type
 detect_url_type()
 {
     local url=$1
-    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3
+    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_BR=4
     local urlcore
 
     urlcore=`echo "$url" | get_url_core`
@@ -150,6 +154,8 @@ detect_url_type()
         echo "$UT_VK"
     elif [ "$urlcore" = "my.mail.ru" ]; then
         echo "$UT_MR"
+    elif [ "$urlcore" = "www.brighteon.com" ]; then
+        echo "$UT_BR"
     fi
 }
 
@@ -422,11 +428,81 @@ END {
 '
 }
 
-# Load video from YouTube, Ok.ru, Vk.com or Mail.ru with determination
-# of optimal video format
+# Load file from Brighteon.com
+# load_file_mr(url, ofname)
+# args:
+#   url - The url for video on Brighteon.com
+#   ofname - The output filename for saving loaded video
+# return:
+#   0 if file loaded
+#   1 if any error
+load_file_br()
+{
+    local url=$1
+    local ofname=$2
+    local m3u8_url
+
+    msg "Loading file from Brighteon.com to $ofname"
+    m3u8_url=`load_file_br_get_m3u8_url "$url"`
+    if [ -z "$m3u8_url" ]; then
+        error "Video m3u8 url is not found"
+        return 1
+    fi
+    msg "Found m3u8 url"
+    msg "No resume. Start from beginning."
+    Yt "$m3u8_url" "$ofname" 2>&1 | \
+        load_file_br_wrapper_wrap_to_hdr_times
+}
+
+# Load m3u8 url for video url from Brighteon.com
+# load_file_br_get_m3u8_url(url)
+# args:
+#   url - The url for video on Brighteon.com
+# stdout:
+#   the m3u8 url for video url
+# return:
+#   0 if file loaded
+#   1 if any error
+load_file_br_get_m3u8_url()
+{
+    local url=$1
+    curl -s "$url" | sed '
+s%^.*"source":\[{"src":"%%
+s%","type":.*$%%
+q
+'
+}
+
+# Wrap lines from stdin while downloading from Brighteon.com
+# to header lines and time lines and print them to stdout
+# load_file_br_wrapper_wrap_output()
+# stdin:
+#   lines - The output of download from Brighteon.com
+# stdout:
+#   header lines - Three header lines
+#   time lines - Lines with time points in video
+# return:
+#   0 if wrapped
+#   1 if any error
+load_file_br_wrapper_wrap_to_hdr_times()
+{
+    sed -n '
+1,3p
+4,$ {
+  /frame=/ {
+    s/^.*time=//
+    s/ bitrate.*$//
+    p
+  }
+}
+'
+}
+
+# Load video from YouTube, Ok.ru, Vk.com, Mail.ru or Brighteon.com
+# with determination of optimal video format
 # main([url, ofname])
 # args:
-#   url - The url for video on YouTube, Ok.ru, Vk.com or Mail.ru
+#   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru or Brighteon.com
 #   ofname - The output filename for the loaded video
 # return:
 #   0 - if video loaded and saved
