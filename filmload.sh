@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Loads a film from YouTube.com, Ok.ru, Vk.com, Mail.ru and Brighteon.com
-# by url to output filename, selecting right format of the video.
+# This script loads a film from YouTube.com, Ok.ru, Vk.com, Mail.ru
+# and Brighteon.com by the url to the output filename, selecting
+# an optimal video format (neither very large, nor very small)
+# for watching on a tv screen.
 # Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>
 
 progname=`basename $0`
