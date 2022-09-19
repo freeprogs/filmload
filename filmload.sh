@@ -36,9 +36,9 @@ help_info()
     {
         echo "usage: $progname url savename"
         echo ""
-        echo "Load a film from YouTube.com, Ok.ru, Vk.com, Mail.ru "
-        echo "and Brighteon.com by url to the output filename, selecting "
-        echo "an optimal video format (neither very large, nor very small) "
+        echo "Load a film from YouTube.com, Ok.ru, Vk.com, Mail.ru"
+        echo "and Brighteon.com by url to the output filename, selecting"
+        echo "an optimal video format (neither very large, nor very small)"
         echo "for watching on a tv screen."
         echo ""
         echo "  noarg      --  Print program usage information."
@@ -49,8 +49,8 @@ help_info()
         echo ""
         echo "  $progname https://www.youtube.com/watch?v=a1b2c3d4 videoname.mp4"
         echo ""
-        echo "  It will load the video file from YouTube with optimal resolution "
-        echo "  and size and save it as videoname.mp4 ."
+        echo "  It will load the video file from YouTube with optimal resolution"
+        echo "  and size and save it as videoname.mp4 file."
         echo ""
     } >&2
 }
