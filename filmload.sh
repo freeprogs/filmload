@@ -26,7 +26,44 @@ msg()
 # usage()
 usage()
 {
-    echo "usage: $progname url savename" >&2
+    echo "Try \`$progname --help' for more information." >&2
+}
+
+# Print program help info to stderr
+# help_info()
+help_info()
+{
+    {
+        echo "usage: $progname url savename"
+        echo ""
+        echo "Load a film from YouTube.com, Ok.ru, Vk.com, Mail.ru "
+        echo "and Brighteon.com by url to the output filename, selecting "
+        echo "an optimal video format (neither very large, nor very small) "
+        echo "for watching on a tv screen."
+        echo ""
+        echo "  noarg      --  Print program usage information."
+        echo "  --help     --  Print program help information."
+        echo "  --version  --  Print program version information."
+        echo ""
+        echo "Example:"
+        echo ""
+        echo "  $progname https://www.youtube.com/watch?v=a1b2c3d4 videoname.mp4"
+        echo ""
+        echo "  It will load the video file from YouTube with optimal resolution "
+        echo "  and size and save it as videoname.mp4 ."
+        echo ""
+    } >&2
+}
+
+# Print program version information to stderr
+# print_version()
+print_version()
+{
+    {
+        echo "filmload v1.0.0"
+        echo "Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>"
+        echo "License: GNU GPLv3"
+    } >&2
 }
 
 # Download YouTube video in selected format
@@ -537,11 +574,36 @@ load_file_br_wrapper_wrap_to_hdr_times()
 #   1 - if any error
 main()
 {
+    local url
+    local ofname
+
     case $# in
-      0) usage; return 1;;
-      2) load_file "$1" "$2" && return 0;;
-      *) error "unknown arglist: "$*""; return 1;;
+      0)
+        usage
+        return 1
+        ;;
+      1)
+        [ "$1" = "--help" ] && {
+            help_info
+            return 1
+        }
+        [ "$1" = "--version" ] && {
+            print_version
+            return 1
+        }
+        ;;
+      2)
+        usage
+        url=$1
+        ofname=$2
+        load_file "$url" "$ofname" || return 1
+        ;;
+      *)
+        error "unknown arglist: "$*""
+        return 1
+        ;;
     esac
+    return 0
 }
 
 main "$@" || exit 1
