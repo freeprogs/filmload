@@ -179,7 +179,7 @@ load_file()
 #   "3" - For Mail.ru url
 #   "4" - For Rutube.ru url
 #   "5" - For Brighteon.com url
-#   none - if unknown url type
+#   none - If unknown url type
 detect_url_type()
 {
     local url=$1
@@ -207,7 +207,7 @@ detect_url_type()
 # args:
 #   url - The url in form https://domain/path
 # return:
-#   "domain" - part of url between protocol and path
+#   "domain" - Part of url between protocol and path
 get_url_core()
 {
     sed 's%^https://\([^/]*\)/.*$%\1%'
@@ -219,8 +219,8 @@ get_url_core()
 #   url - The url for video on YouTube
 #   ofname - The output filename for saving loaded video
 # return:
-#   0 if file loaded
-#   1 if any error
+#   0 - If file loaded
+#   1 - If any error
 load_file_yt()
 {
     local url=$1
@@ -290,8 +290,8 @@ END {
 #   url - The url for video on Ok.ru
 #   ofname - The output filename for saving loaded video
 # return:
-#   0 if file loaded
-#   1 if any error
+#   0 - If file loaded
+#   1 - If any error
 load_file_ok()
 {
     local url=$1
@@ -315,9 +315,9 @@ load_file_ok()
 # args:
 #   url - The url for video on Ok.ru
 # return:
-#   "format for hd" - string with format for hd
-#   "format for sd" - string with format for sd if no hd
-#   none - if no sd and no hd
+#   "format for hd" - String with format for hd
+#   "format for sd" - String with format for sd if no hd
+#   none - If no sd and no hd
 load_file_ok_get_vformat()
 {
     local url=$1
@@ -343,8 +343,8 @@ END {print vformat}
 #   url - The url for video on Vk.com
 #   ofname - The output filename for saving loaded video
 # return:
-#   0 if file loaded
-#   1 if any error
+#   0 - If file loaded
+#   1 - If any error
 load_file_vk()
 {
     local url=$1
@@ -413,8 +413,8 @@ END {
 #   url - The url for video on Mail.ru
 #   ofname - The output filename for saving loaded video
 # return:
-#   0 if file loaded
-#   1 if any error
+#   0 - If file loaded
+#   1 - If any error
 load_file_mr()
 {
     local url=$1
@@ -438,7 +438,10 @@ load_file_mr()
 # args:
 #   url - The url for video on Mail.ru
 # return:
-#   "720p" | "1080p" | "480p" | none
+#   "720p" |
+#   "1080p" |
+#   "480p" |
+#   none
 load_file_mr_get_vformat()
 {
     local url=$1
@@ -477,8 +480,8 @@ END {
 #   url - The url for video on Rutube.ru
 #   ofname - The output filename for saving loaded video
 # return:
-#   0 if file loaded
-#   1 if any error
+#   0 - If file loaded
+#   1 - If any error
 load_file_rt()
 {
     local url=$1
@@ -547,8 +550,8 @@ END {
 #   url - The url for video on Brighteon.com
 #   ofname - The output filename for saving loaded video
 # return:
-#   0 if file loaded
-#   1 if any error
+#   0 - If file loaded
+#   1 - If any error
 load_file_br()
 {
     local url=$1
@@ -579,10 +582,10 @@ load_file_br()
 # args:
 #   url - The url for video on Brighteon.com
 # stdout:
-#   the m3u8 url for video url
+#   The m3u8 url for video url
 # return:
-#   0 if source file loaded and parsed
-#   1 if any error
+#   0 - If source file loaded and parsed
+#   1 - If any error
 load_file_br_get_m3u8_url()
 {
     local url=$1
@@ -598,10 +601,10 @@ q
 # args:
 #   url - The url for video on Brighteon.com
 # stdout:
-#   duration of video
+#   Duration of video
 # return:
-#   0 if source file loaded and parsed
-#   1 if any error
+#   0 - If source file loaded and parsed
+#   1 - If any error
 load_file_br_get_duration()
 {
     local url=$1
@@ -621,8 +624,8 @@ q
 #   header lines - Three header lines
 #   time lines - Lines with time points in video
 # return:
-#   0 if wrapped
-#   1 if any error
+#   0 - If wrapped
+#   1 - If any error
 load_file_br_wrapper_wrap_to_hdr_times()
 {
     sed -n '
@@ -645,8 +648,8 @@ load_file_br_wrapper_wrap_to_hdr_times()
 #         or Brighteon.com
 #   ofname - The output filename for the loaded video
 # return:
-#   0 - if video loaded and saved
-#   1 - if any error
+#   0 - If video loaded and saved
+#   1 - If any error
 main()
 {
     local url
