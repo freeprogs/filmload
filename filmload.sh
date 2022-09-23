@@ -60,7 +60,7 @@ help_info()
 print_version()
 {
     {
-        echo "filmload v1.0.0"
+        echo "filmload v1.0.1"
         echo "Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>"
         echo "License: GNU GPLv3"
     } >&2
