@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# This script loads a film from YouTube.com, Ok.ru, Vk.com, Mail.ru
-# and Brighteon.com by the url to the output filename, selecting
-# an optimal video format (neither very large, nor very small)
-# for watching on a tv screen.
+# This script loads a film from YouTube.com, Ok.ru, Vk.com, Mail.ru,
+# Rutube.ru and Brighteon.com by the url to the output filename,
+# selecting an optimal video format (neither very large, nor very
+# small) for watching on a tv screen.
 # Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>
 
 progname=`basename $0`
@@ -36,7 +36,7 @@ help_info()
     {
         echo "usage: $progname url savename"
         echo ""
-        echo "Load a film from YouTube.com, Ok.ru, Vk.com, Mail.ru"
+        echo "Load a film from YouTube.com, Ok.ru, Vk.com, Mail.ru, Rutube.ru"
         echo "and Brighteon.com by url to the output filename, selecting"
         echo "an optimal video format (neither very large, nor very small)"
         echo "for watching on a tv screen."
@@ -139,12 +139,12 @@ Ytl()
     youtube-dl -F "$1" | sed '1,/format code/d'
 }
 
-# Load file from the YouTube, Ok.ru, Vk.com, Mail.ru or Brighteon.com url
-# to the output file
+# Load file from the YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru
+# or Brighteon.com url to the output file
 # load_file(url, ofname)
 # args:
-#   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru
-#         or Brighteon.com
+#   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru,
+#         Rutube.ru or Brighteon.com
 #   ofname - The output file name
 # return:
 #   none
@@ -153,7 +153,7 @@ load_file()
     local url=$1
     local ofname=$2
     local urltype
-    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_BR=4
+    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_RT=4 UT_BR=5
 
     urltype=`detect_url_type "$url"`
     case $urltype in
@@ -161,6 +161,7 @@ load_file()
       $UT_OK) load_file_ok "$url" "$ofname";;
       $UT_VK) load_file_vk "$url" "$ofname";;
       $UT_MR) load_file_mr "$url" "$ofname";;
+      $UT_RT) load_file_rt "$url" "$ofname";;
       $UT_BR) load_file_br "$url" "$ofname";;
       *) error "Unknown url type: \"$urltype\"";;
     esac
@@ -169,19 +170,20 @@ load_file()
 # Detect url type that means on which site this url is placed
 # detect_url_type(url)
 # args:
-#   url - The url to video on YouTube, Ok.ru, Vk.com, Mail.ru
-#         or Brighteon.com
+#   url - The url to video on YouTube, Ok.ru, Vk.com, Mail.ru,
+#         Rutube.ru or Brighteon.com
 # return:
 #   "0" - For YouTube url
 #   "1" - For Ok.ru url
 #   "2" - For Vk.com url
 #   "3" - For Mail.ru url
-#   "4" - For Brighteon.com url
+#   "4" - For Rutube.ru url
+#   "5" - For Brighteon.com url
 #   none - if unknown url type
 detect_url_type()
 {
     local url=$1
-    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_BR=4
+    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_RT=4 UT_BR=5
     local urlcore
 
     urlcore=`echo "$url" | get_url_core`
@@ -193,6 +195,8 @@ detect_url_type()
         echo "$UT_VK"
     elif [ "$urlcore" = "my.mail.ru" ]; then
         echo "$UT_MR"
+    elif [ "$urlcore" = "rutube.ru" ]; then
+        echo "$UT_RT"
     elif [ "$urlcore" = "www.brighteon.com" ]; then
         echo "$UT_BR"
     fi
@@ -467,6 +471,76 @@ END {
 '
 }
 
+# Load file from Rutube.ru
+# load_file_rt(url, ofname)
+# args:
+#   url - The url for video on Rutube.ru
+#   ofname - The output filename for saving loaded video
+# return:
+#   0 if file loaded
+#   1 if any error
+load_file_rt()
+{
+    local url=$1
+    local ofname=$2
+    local vformat
+
+    msg "Loading file from Rutube.ru to $ofname"
+    vformat=`load_file_rt_get_vformat "$url"`
+    if [ -z "$vformat" ]; then
+        error "Video format is not found"
+        return 1
+    fi
+    msg "Found format $vformat"
+    Ytfn "$url" "$ofname" "$vformat"
+}
+
+# Determine the optimal format for video on Rutube.ru;
+# It returns m3u8-form for different formats; for the 720p format
+# otherwise for the 1080p format otherwise for the 480p format if
+# previous formats don't exist
+# load_file_rt_get_vformat(url)
+# args:
+#   url - The url for video on Rutube.ru
+# return:
+#   "m3u8-NNNN" for 720p |
+#   "m3u8-NNNN" for 1080p |
+#   "m3u8-NNNN" for 480p |
+#   none
+load_file_rt_get_vformat()
+{
+    local url=$1
+
+    Ytl "$url" | awk '
+$1 ~ /^m3u8/ && $2 == "mp4" {
+    if ($3 ~ /x480$/) {
+        has480 = 1
+        vformat480 = $1
+    }
+    else if ($3 ~ /x720$/) {
+        has720 = 1
+        vformat720 = $1
+    }
+    else if ($3 ~ /x1080$/) {
+        has1080 = 1
+        vformat1080 = $1
+    }
+}
+END {
+    if (has720) {
+       vformat = vformat720
+    }
+    else if (has1080) {
+       vformat = vformat1080
+    }
+    else if (has480) {
+       vformat = vformat480
+    }
+    print vformat
+}
+'
+}
+
 # Load file from Brighteon.com
 # load_file_mr(url, ofname)
 # args:
@@ -563,11 +637,12 @@ load_file_br_wrapper_wrap_to_hdr_times()
 '
 }
 
-# Load video from YouTube, Ok.ru, Vk.com, Mail.ru or Brighteon.com
+# Load video from YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru or Brighteon.com
 # with determination of optimal video format
 # main([url, ofname])
 # args:
-#   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru or Brighteon.com
+#   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru
+#         or Brighteon.com
 #   ofname - The output filename for the loaded video
 # return:
 #   0 - if video loaded and saved
