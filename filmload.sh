@@ -542,7 +542,7 @@ END {
 }
 
 # Load file from Brighteon.com
-# load_file_mr(url, ofname)
+# load_file_br(url, ofname)
 # args:
 #   url - The url for video on Brighteon.com
 #   ofname - The output filename for saving loaded video
