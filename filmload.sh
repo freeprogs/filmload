@@ -5,6 +5,7 @@
 # selecting an optimal video format (neither very large, nor very
 # small) for watching on a tv screen.
 # Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>
+# License: GNU GPLv3
 
 progname=`basename $0`
 
