@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # This script loads a film from YouTube.com, Ok.ru, Vk.com, Mail.ru,
-# Rutube.ru and Brighteon.com by the url to the output filename,
-# selecting an optimal video format (neither very large, nor very
-# small) for watching on a tv screen.
+# Rutube.ru, Brighteon.com and Dzen.ru by the url to the output
+# filename, selecting an optimal video format (neither very large, nor
+# very small) for watching on a tv screen.
 # Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>
 # License: GNU GPLv3
 
@@ -37,8 +37,8 @@ help_info()
     {
         echo "usage: $progname url savename"
         echo ""
-        echo "Load a film from YouTube.com, Ok.ru, Vk.com, Mail.ru, Rutube.ru"
-        echo "and Brighteon.com by url to the output filename, selecting"
+        echo "Load a film from YouTube.com, Ok.ru, Vk.com, Mail.ru, Rutube.ru,"
+        echo "Brighteon.com and Dzen.ru by url to the output filename, selecting"
         echo "an optimal video format (neither very large, nor very small)"
         echo "for watching on a tv screen."
         echo ""
@@ -140,12 +140,12 @@ Ytl()
     youtube-dl -F "$1" | sed '1,/format code/d'
 }
 
-# Load file from the YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru
-# or Brighteon.com url to the output file
+# Load file from the YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru,
+# Brighteon.com or Dzen.ru url to the output file
 # load_file(url, ofname)
 # args:
 #   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru,
-#         Rutube.ru or Brighteon.com
+#         Rutube.ru, Brighteon.com or Dzen.ru
 #   ofname - The output file name
 # return:
 #   none
@@ -154,7 +154,7 @@ load_file()
     local url=$1
     local ofname=$2
     local urltype
-    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_RT=4 UT_BR=5
+    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_RT=4 UT_BR=5 UT_DZ=6
 
     urltype=`detect_url_type "$url"`
     case $urltype in
@@ -164,6 +164,7 @@ load_file()
       $UT_MR) load_file_mr "$url" "$ofname";;
       $UT_RT) load_file_rt "$url" "$ofname";;
       $UT_BR) load_file_br "$url" "$ofname";;
+      $UT_DZ) load_file_dz "$url" "$ofname";;
       *) error "Unknown url type: \"$urltype\"";;
     esac
 }
@@ -172,7 +173,7 @@ load_file()
 # detect_url_type(url)
 # args:
 #   url - The url to video on YouTube, Ok.ru, Vk.com, Mail.ru,
-#         Rutube.ru or Brighteon.com
+#         Rutube.ru, Brighteon.com or Dzen.ru
 # return:
 #   "0" - For YouTube url
 #   "1" - For Ok.ru url
@@ -180,11 +181,12 @@ load_file()
 #   "3" - For Mail.ru url
 #   "4" - For Rutube.ru url
 #   "5" - For Brighteon.com url
+#   "6" - For Dzen.ru url
 #   none - If unknown url type
 detect_url_type()
 {
     local url=$1
-    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_RT=4 UT_BR=5
+    local UT_YT=0 UT_OK=1 UT_VK=2 UT_MR=3 UT_RT=4 UT_BR=5 UT_DZ=6
     local urlcore
 
     urlcore=`echo "$url" | get_url_core`
@@ -200,6 +202,8 @@ detect_url_type()
         echo "$UT_RT"
     elif [ "$urlcore" = "www.brighteon.com" ]; then
         echo "$UT_BR"
+    elif [ "$urlcore" = "dzen.ru" ]; then
+        echo "$UT_DZ"
     fi
 }
 
@@ -641,12 +645,108 @@ load_file_br_wrapper_wrap_to_hdr_times()
 '
 }
 
-# Load video from YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru or Brighteon.com
-# with determination of optimal video format
+# Load file from Dzen.ru
+# load_file_dz(url, ofname)
+# args:
+#   url - The url for video on Dzen.ru
+#   ofname - The output filename for saving loaded video
+# return:
+#   0 - If file loaded
+#   1 - If any error
+load_file_dz()
+{
+    local url=$1
+    local ofname=$2
+    local m3u8_url
+
+    msg "Loading file from Dzen.ru to $ofname"
+    m3u8_url=`load_file_dz_get_m3u8_url "$url"`
+    if [ -z "$m3u8_url" ]; then
+        error "Video m3u8 url is not found"
+        return 1
+    fi
+    msg "Found m3u8 url"
+    Ytn "$m3u8_url" "$ofname"
+}
+
+# Load m3u8 url for video url from Dzen.ru
+# load_file_dz_get_m3u8_url(url)
+# args:
+#   url - The url for video on Dzen.ru
+# stdout:
+#   The m3u8 url for video url
+# return:
+#   0 - If source file loaded and parsed
+#   1 - If any error
+load_file_dz_get_m3u8_url()
+{
+    local url=$1
+    local url_embed
+    local url_final
+    local out
+
+    url_embed=$(load_file_dz_load_m3u8_embed "$url")
+    url_final=$(load_file_dz_load_m3u8_final "${url_embed}")
+    out="${url_final}"
+    echo "$out"
+}
+
+# Load embed url for video url from Dzen.ru
+# load_file_dz_load_m3u8_embed(url)
+# args:
+#   url - The url for video on Dzen.ru
+# stdout:
+#   The embed url for video url
+# return:
+#   0 - If source file loaded and parsed
+#   1 - If any error
+load_file_dz_load_m3u8_embed()
+{
+    local url=$1
+    local out
+
+    out=$(
+        curl -s -b "Session_id=noauth" "$url" | sed -n '
+/<meta property="twitter:player:stream"/ {
+    s/^.*<meta property="twitter:player:stream" content="\([^"]*\)".*$/\1/p
+    q
+}
+'
+    )
+    echo "$out"
+}
+
+# Load final url for embed video url from Dzen.ru
+# load_file_dz_load_m3u8_final(url)
+# args:
+#   url - The embed url for video on Dzen.ru
+# stdout:
+#   The final url for embed video url
+# return:
+#   0 - If source file loaded and parsed
+#   1 - If any error
+load_file_dz_load_m3u8_final()
+{
+    local url=$1
+    local out
+
+    out=$(
+        curl -s "$url" | sed -n '
+/"options":\[\],"url":"/ {
+    s/^.*"options":\[\],"url":"\([^"]*\).*$/\1/p
+    q
+}
+'
+    )
+    echo "$out"
+}
+
+# Load video from YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru, Brighteon.com
+# or Dzen.ru with determination of optimal video format
 # main([url, ofname])
 # args:
-#   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru
-#         or Brighteon.com
+#   url - The url for video on YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru,
+#         Brighteon.com or Dzen.ru
 #   ofname - The output filename for the loaded video
 # return:
 #   0 - If video loaded and saved
