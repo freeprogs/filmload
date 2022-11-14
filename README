@@ -1,10 +1,10 @@
 
-filmload v1.0.1
+filmload v1.0.2
 
-Loads a film from YouTube.com, Ok.ru, Vk.com, Mail.ru, Rutube.ru and
-Brighteon.com by the url to the output filename, selecting an optimal
-video format (neither very large, nor very small) for watching on a tv
-screen.
+Loads a film from YouTube.com, Ok.ru, Vk.com, Mail.ru, Rutube.ru,
+Brighteon.com and Dzen.ru by the url to the output filename, selecting
+an optimal video format (neither very large, nor very small) for
+watching on a tv screen.
 
 This script uses programs for loading videos:
 
