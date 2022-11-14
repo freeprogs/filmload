@@ -562,7 +562,6 @@ load_file_br()
     local url=$1
     local ofname=$2
     local m3u8_url
-    local duration
 
     msg "Loading file from Brighteon.com to $ofname"
     m3u8_url=`load_file_br_get_m3u8_url "$url"`
@@ -571,15 +570,7 @@ load_file_br()
         return 1
     fi
     msg "Found m3u8 url"
-    duration=`load_file_br_get_duration "$url"`
-    if [ -z "$duration" ]; then
-        error "Duration is not found"
-        return 1
-    fi
-    msg "Duration of video is $duration"
-    msg "No resume. Start from beginning."
-    Yt "$m3u8_url" "$ofname" 2>&1 | \
-        load_file_br_wrapper_wrap_to_hdr_times
+    Ytn "$m3u8_url" "$ofname"
 }
 
 # Load m3u8 url for video url from Brighteon.com
@@ -598,50 +589,6 @@ load_file_br_get_m3u8_url()
 s%^.*"source":\[{"src":"%%
 s%","type":.*$%%
 q
-'
-}
-
-# Load duration for video from Brighteon.com
-# load_file_br_get_duration(url)
-# args:
-#   url - The url for video on Brighteon.com
-# stdout:
-#   Duration of video
-# return:
-#   0 - If source file loaded and parsed
-#   1 - If any error
-load_file_br_get_duration()
-{
-    local url=$1
-    curl -s "$url" | sed '
-s%^.*"duration":"%%
-s%","is.*$%%
-q
-'
-}
-
-# Wrap lines from stdin while downloading from Brighteon.com
-# to header lines and time lines and print them to stdout
-# load_file_br_wrapper_wrap_output()
-# stdin:
-#   lines - The output of download from Brighteon.com
-# stdout:
-#   header lines - Three header lines
-#   time lines - Lines with time points in video
-# return:
-#   0 - If wrapped
-#   1 - If any error
-load_file_br_wrapper_wrap_to_hdr_times()
-{
-    sed -n '
-1,3p
-4,$ {
-  /frame=/ {
-    s/^.*time=//
-    s/ bitrate.*$//
-    p
-  }
-}
 '
 }
 
