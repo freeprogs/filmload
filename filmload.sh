@@ -4,7 +4,7 @@
 # Rutube.ru, Brighteon.com and Dzen.ru by the url to the output
 # filename, selecting an optimal video format (neither very large, nor
 # very small) for watching on a tv screen.
-# Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>
+# Copyright (C) 2021-2023, Slava <freeprogs.feedback@yandex.ru>
 # License: GNU GPLv3
 
 progname=`basename $0`
@@ -61,8 +61,8 @@ help_info()
 print_version()
 {
     {
-        echo "filmload v1.0.3"
-        echo "Copyright (C) 2021-2022, Slava <freeprogs.feedback@yandex.ru>"
+        echo "filmload v1.0.4"
+        echo "Copyright (C) 2021-2023, Slava <freeprogs.feedback@yandex.ru>"
         echo "License: GNU GPLv3"
     } >&2
 }
