@@ -140,6 +140,21 @@ Ytl()
     youtube-dl -F "$1" | sed '1,/format code/d'
 }
 
+# Get available YouTube video file formats
+# Use yt-dlp program
+# Ytln(url)
+Ytln ()
+{
+    [ $# -eq 0 -o "$1" = "--help" ] && {
+        echo "usage: $FUNCNAME url";
+        return 1
+    } 1>&2;
+    yt-dlp -F "$1" | awk '
+$1 == "ID" && $2 == "EXT" { state_show = 1; }
+state_show { print }
+'
+}
+
 # Load file from the YouTube, Ok.ru, Vk.com, Mail.ru, Rutube.ru,
 # Brighteon.com or Dzen.ru url to the output file
 # load_file(url, ofname)
@@ -363,7 +378,7 @@ load_file_vk()
         return 1
     fi
     msg "Found format $vformat"
-    Ytf "$url" "$ofname" "$vformat"
+    Ytfn "$url" "$ofname" "$vformat"
 }
 
 # Determine the optimal format for video on Vk.com;
@@ -382,7 +397,7 @@ load_file_vk_get_vformat()
 {
     local url=$1
 
-    Ytl "$url" | awk '
+    Ytln "$url" | awk '
 $1 ~ /^hls/ && $2 == "mp4" {
     if ($3 ~ /x480$/) {
         has480 = 1
